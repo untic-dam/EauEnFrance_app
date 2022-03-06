@@ -2,6 +2,7 @@ import functions as f
 import streamlit as st
 import pandas as pd
 import time 
+import matplotlib.pyplot as plt
 
 
 st.write("""
@@ -34,7 +35,6 @@ chronique_req, chroniques = f.recup_chronique(code_bss)
 
 #8 Afficher la piezo
 #transformation chroniques -> df time series
-
 #chroniques (list) -> df
 df_chronique_brut = pd.DataFrame(chroniques)
 # df -> .csv
@@ -42,6 +42,9 @@ df_chronique_brut.to_csv('data.csv', index=False)
 # csv -> df time series
 df_chronique = pd.read_csv('data.csv', index_col='date_mesure', parse_dates=True)
 
-st.pyplot(df_chronique['niveau_nappe_eau'].plot())
+#plot
+fig = f.matplot_piezo(df_chronique)
+st.pyplot(fig)
+
 
 

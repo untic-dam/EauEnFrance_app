@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def recup_commune(code_postal):
     #addresse api
@@ -69,3 +70,20 @@ def recup_chronique(code_bss, size=5000):
     print(f"il y a {len(chroniques)} mesure(s)")
     
     return chronique_req, chroniques
+
+
+def matplot_piezo(df_chronique, attribut='profondeur_nappe', resample_size='Y'):
+    #extract data
+    nappe = df_chronique[attribut].resample(resample_size).agg(['mean', 'std', 'min', 'max'])
+    #define series
+    x = nappe.index
+    y = nappe['mean'].values
+    y_min = nappe['min'].values
+    y_max = nappe['max'].values
+    #plot
+    fig, ax = plt.subplots()
+    ax.plot(x, y, label=attribut)
+    ax.fill_between(x, y_min, y_max, alpha=0.2, label='min-max')
+    ax.legend()
+
+    return fig
