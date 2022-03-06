@@ -50,6 +50,46 @@ def station_max_mesure(stations):
     return station
 
 
+def return_df_stations(stations):
+    df_stations = pd.DataFrame(stations)
+    #colonnes pertinentes
+    cols = ['code_bss', 'nb_mesures_piezo']
+    df_stations_light = df_stations[cols]
+    #tri dans l'ordre croisant
+    df_stations_light.sort_values(by='nb_mesures_piezo', ascending=False, inplace=True)
+    #reset index pour être afficher correctement dans st.selectbox
+    df_stations_light.reset_index(drop=True, inplace=True)
+
+    return df_stations_light
+
+def extrait_list_stations_to_selectbox(stations):
+
+    df_stations_light = return_df_stations(stations)
+
+    #loop pour creer les labels à afficher dans selectbox
+    list_stations = []
+    for i in df_stations_light.index:
+        code = df_stations_light.iloc[i,0]
+        n_mesure = df_stations_light.iloc[i,1]
+
+        txt = f"{code} | {n_mesure} mesures"
+
+        list_stations.append(txt)
+
+    return list_stations
+
+def fetch_station(stations, station_code):
+    #permet de retourner la station correspondant au code_bss dans une list de stations 
+
+    station = {}
+    for s in stations:
+        if s['code_bss'] == station_code:
+            station = s
+    
+    return station
+
+
+
 def station_to_map(station):
     cols = ['x', 'y']
 

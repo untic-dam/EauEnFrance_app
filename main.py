@@ -21,27 +21,8 @@ insee, ville, population = f.recup_commune(code_postal)
 station_req, stations = f.recup_list_stations(insee, ville)
 
 #4 afficher les stations
-
 #get liste stations et nbr de mesure
-#extrait la liste de stations sous forme d'un df
-df_stations = pd.DataFrame(stations)
-#colonnes pertinentes
-cols = ['code_bss', 'nb_mesures_piezo']
-df_stations_light = df_stations[cols]
-#tri dans l'ordre croisant
-df_stations_light.sort_values(by='nb_mesures_piezo', ascending=False, inplace=True)
-#reset index pour être afficher correctement dans st.selectbox
-df_stations_light.reset_index(drop=True, inplace=True)
-
-#loop pour creer les labels à afficher dans selectbox
-list_stations = []
-for i in df_stations_light.index:
-    code = df_stations_light.iloc[i,0]
-    n_mesure = df_stations_light.iloc[i,1]
-
-    txt = f"{code} | {n_mesure} mesures"
-
-    list_stations.append(txt)
+list_stations = f.extrait_list_stations_to_selectbox(stations)
 
 #selection de la station
 station_lbl = st.selectbox(
@@ -50,18 +31,31 @@ station_lbl = st.selectbox(
 
 #extraction du code bss
 station_code = station_lbl.split(' | ')[0]
+#fetch la station à partir du code selectionné
+station = f.fetch_station(stations, station_code)
 
-def fetch_station(stations, station_code):
-    #permet de retourner la station correspondant au code_bss dans une list de stations 
+#5 choisir une stations
+#station = f.station_max_mesure(stations)
 
-    station = {}
-    for s in stations:
-        if s['code_bss'] == station_code:
-            station = s
-    
-    return station
+#6 affiche la station selectionnée
+station_loc = f.station_to_map(station)
+st.map(station_loc)
 
-station = fetch_station(stations, station_code)
-st.json(station)
+#7 recupère la chronique
+code_bss = station['code_bss']
+chronique_req, chroniques = f.recup_chronique(code_bss)
+
+#8 Afficher la piezo
+#transformation chroniques -> df time series
+#chroniques (list) -> df
+df_chronique_brut = pd.DataFrame(chroniques)
+# df -> .csv
+df_chronique_brut.to_csv('data.csv', index=False)
+# csv -> df time series
+df_chronique = pd.read_csv('data.csv', index_col='date_mesure', parse_dates=True)
+
+#plot
+fig = f.matplot_piezo(df_chronique)
+st.pyplot(fig)
 
 
