@@ -1,5 +1,6 @@
 import functions as f
 import streamlit as st
+import pandas as pd
 import time 
 
 
@@ -23,7 +24,24 @@ station_req, stations = f.recup_list_stations(insee, ville)
 #5 choisir une stations
 station = f.station_max_mesure(stations)
 
-# affiche la station selectionnée
+#6 affiche la station selectionnée
 station_loc = f.station_to_map(station)
 st.map(station_loc)
+
+#7 recupère la chronique
+code_bss = station['code_bss']
+chronique_req, chroniques = f.recup_chronique(code_bss)
+
+#8 Afficher la piezo
+#transformation chroniques -> df time series
+
+#chroniques (list) -> df
+df_chronique_brut = pd.DataFrame(chroniques)
+# df -> .csv
+df_chronique_brut.to_csv('data.csv', index=False)
+# csv -> df time series
+df_chronique = pd.read_csv('data.csv', index_col='date_mesure', parse_dates=True)
+
+st.pyplot(df_chronique['niveau_nappe_eau'].plot())
+
 

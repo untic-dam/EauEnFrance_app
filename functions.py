@@ -50,7 +50,7 @@ def station_max_mesure(stations):
 
 
 def station_to_map(station):
-    cols = ['y', 'x']
+    cols = ['x', 'y']
 
     df_station = pd.DataFrame(station, index=[0])
     df_station = df_station[cols]
@@ -58,3 +58,14 @@ def station_to_map(station):
     df_station.rename(columns={'y':'lat'}, inplace=True)
     
     return df_station
+
+
+def recup_chronique(code_bss, size=5000):
+    
+    chronique_url = f'https://hubeau.eaufrance.fr/api/v1/niveaux_nappes/chroniques?code_bss={code_bss}&size={str(size)}'
+
+    chronique_req = requests.get(chronique_url).json()
+    chroniques = chronique_req['data']
+    print(f"il y a {len(chroniques)} mesure(s)")
+    
+    return chronique_req, chroniques
