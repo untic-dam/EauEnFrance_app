@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import time 
 import matplotlib.pyplot as plt
+import base64
 
 
 st.write("""
@@ -14,7 +15,7 @@ Avec cette application web vous allez pouvoir extraire les niveaux piézométriq
 #1 recupère le code postal ou nom de ville
 user_request = st.text_input('CODE POSTAL ou NOM DE LA VILLE', 'Wolfisheim')
 
-#2 recupere le code INSEE associe au code potal
+#2 recupere le code INSEE associe au code potal ou au nom de la ville
 insee, ville = f.recup_code_insee(user_request)
 
 #3 recupere la liste des stations situées dans la ville
@@ -25,18 +26,16 @@ station_req, stations = f.recup_list_stations(insee, ville)
 #get liste stations et nbr de mesure
 list_stations = f.extrait_list_stations_to_selectbox(stations)
 
-#selection de la station
+#5selection de la station
 station_lbl = st.selectbox(
         'Selectionner la station',
         list_stations)
 
 #extraction du code bss
 station_code = station_lbl.split(' | ')[0]
+
 #fetch la station à partir du code selectionné
 station = f.fetch_station(stations, station_code)
-
-#5 choisir une stations
-#station = f.station_max_mesure(stations)
 
 #6 affiche la station selectionnée
 station_loc = f.station_to_map(station)
@@ -58,5 +57,15 @@ df_chronique = pd.read_csv('data.csv', index_col='date_mesure', parse_dates=True
 #plot
 fig = f.matplot_piezo(df_chronique)
 st.pyplot(fig)
+
+#9 telecharger data
+def filedownload(df, ville, code_bss):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
+    fn = f'piezo_{ville}_{code_bss}.csv'.replace('/','_')
+    href = f'<a href="data:file/csv;base64,{b64}" download="{fn}">Download CSV File</a>'
+    return href
+
+st.markdown(filedownload(df_chronique, ville, code_bss), unsafe_allow_html=True)
 
 
