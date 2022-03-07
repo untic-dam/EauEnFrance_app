@@ -1,10 +1,9 @@
 import functions as f
 import streamlit as st
 import pandas as pd
-import time 
-import matplotlib.pyplot as plt
-import base64
 
+
+global insee, ville, code_bss
 
 st.write("""
 # Les eaux souterraines en France
@@ -42,7 +41,7 @@ station_loc = f.station_to_map(station)
 st.map(station_loc)
 
 #7 recupère la chronique
-code_bss = station['code_bss']
+code_bss = st.text_input('code bss :', station['code_bss']) 
 chronique_req, chroniques = f.recup_chronique(code_bss)
 
 #8 Afficher la piezo
@@ -59,13 +58,6 @@ fig = f.matplot_piezo(df_chronique)
 st.pyplot(fig)
 
 #9 telecharger data
-def filedownload(df, ville, code_bss):
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
-    fn = f'piezo_{ville}_{code_bss}.csv'.replace('/','_')
-    href = f'<a href="data:file/csv;base64,{b64}" download="{fn}">Download CSV File</a>'
-    return href
-
-st.markdown(filedownload(df_chronique, ville, code_bss), unsafe_allow_html=True)
+st.markdown(f.filedownload(df_chronique, ville, code_bss), unsafe_allow_html=True)
 
 

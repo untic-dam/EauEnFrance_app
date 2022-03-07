@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
+import base64
 
 
 def recup_commune_code_postal(code_postal):
@@ -177,3 +178,11 @@ def matplot_piezo(df_chronique, attribut='profondeur_nappe', resample_size='Y'):
     ax.legend()
 
     return fig
+
+
+def filedownload(df, ville, code_bss):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
+    fn = f'piezo_{ville}_{code_bss}.csv'.replace('/','_')
+    href = f'<a href="data:file/csv;base64,{b64}" download="{fn}">Download CSV File</a>'
+    return href
