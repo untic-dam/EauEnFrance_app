@@ -37,7 +37,7 @@ def recup_commune_nom_ville(nom_ville):
 
 
 def recup_code_insee(user_request):
-    ville_par_defaut = 'Carcassonne' 
+    ville_par_defaut = 'Colmar' 
     ville_inconnue = False
     code_postal_inconnue = False
 
@@ -62,6 +62,7 @@ def recup_code_insee(user_request):
 
 
 def recup_list_stations(insee, ville):
+    code_insee_defaut = '68066' #Colmar
     #code de la ville
     insee_str = str(insee)
     #url pour la requete
@@ -70,7 +71,14 @@ def recup_list_stations(insee, ville):
     #list des stations piezometriques
     stations = station_req['data']
 
-    print(f"il y a {len(stations)} station(s) à {ville}")
+    if len(stations) == 0:
+        print("Impossible de récupérer des stations dans cette ville")
+        print("choix par defaut : ",code_insee_defaut)
+        #on récupère la ville par defaut
+        station_url = f'https://hubeau.eaufrance.fr/api/v1/niveaux_nappes/stations?code_commune={code_insee_defaut}&format=json&size=20&pretty'
+        station_req = requests.get(station_url).json()
+        #list des stations piezometriques
+        stations = station_req['data']
     
     return station_req, stations
 

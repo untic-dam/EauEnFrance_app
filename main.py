@@ -18,6 +18,7 @@ user_request = st.text_input('CODE POSTAL ou NOM DE LA VILLE', 'Wolfisheim')
 insee, ville = f.recup_code_insee(user_request)
 
 #3 recupere la liste des stations situées dans la ville
+st.write("Si la ville séléctionner ne possède pas de station alors c'est Colmar qui est choisi par défaut")
 station_req, stations = f.recup_list_stations(insee, ville)
 
 #4 afficher les stations
