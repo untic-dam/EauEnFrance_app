@@ -54,7 +54,13 @@ df_chronique_brut.to_csv('data.csv', index=False)
 df_chronique = pd.read_csv('data.csv', index_col='date_mesure', parse_dates=True)
 
 #plot
-fig = f.matplot_piezo(df_chronique)
+attribut = st.selectbox(
+        "Selectionner l'attribut ",
+        ['niveau_nappe_eau', 'profondeur_nappe'])
+resample_size = st.selectbox(
+        "moyenne",
+        ['Y', '6M', 'M', 'W', 'D'])
+fig = f.matplot_piezo(df_chronique, attribut, resample_size)
 st.pyplot(fig)
 
 #9 telecharger data
