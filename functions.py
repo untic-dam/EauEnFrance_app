@@ -2,7 +2,8 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def recup_commune(code_postal):
+
+def recup_commune_code_postal(code_postal):
     #addresse api
     curl = f'https://geo.api.gouv.fr/communes?codePostal={str(code_postal)}'
     #requete api
@@ -14,9 +15,50 @@ def recup_commune(code_postal):
     #info
     insee = commune['code']
     ville = commune['nom']
-    population = commune['population']
     
-    return insee, ville, population
+    return insee, ville
+
+
+def recup_commune_nom_ville(nom_ville):
+    #addresse api
+    #curl 'https://geo.api.gouv.fr/communes?nom=Carcassonne&fields=departement&boost=population&limit=5'
+    curl = f'https://geo.api.gouv.fr/communes?nom={str(nom_ville)}&fields=departement&boost=population&limit=5'
+    #requete api
+    commune_req = requests.get(curl).json()
+    
+    #json
+    commune = commune_req[0]
+    
+    #info
+    insee = commune['code']
+    ville = commune['nom']
+    
+    return insee, ville
+
+
+def recup_code_insee(user_request):
+    ville_par_defaut = 'Carcassonne' 
+    ville_inconnue = False
+    code_postal_inconnue = False
+
+    #essaye code postal
+    try:
+        insee, ville = recup_commune_code_postal(user_request)
+    except:
+        code_postal_inconnue = True
+
+    #essaye nom ville
+    try:
+        insee, ville = recup_commune_nom_ville(user_request)
+    except:
+        ville_inconnue = True
+
+    #permet de gérer nom de ville et departement inconnue
+    if (code_postal_inconnue and ville_inconnue) == True:
+        insee, ville = recup_commune_nom_ville(ville_par_defaut)
+        print(f'code postal ou nom de ville inconnue. \nville par défaut : {ville_par_defaut}\n')
+        
+    return insee, ville
 
 
 def recup_list_stations(insee, ville):

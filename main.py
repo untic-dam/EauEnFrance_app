@@ -11,11 +11,11 @@ st.write("""
 Avec cette application web vous allez pouvoir extraire les niveaux piézométriques de plusieurs stations d'observations françaises
 """)
 
-#1 recupère le code postal 
-code_postal = st.text_input('CODE POSTAL', '67000')
+#1 recupère le code postal ou nom de ville
+user_request = st.text_input('CODE POSTAL ou NOM DE LA VILLE', 'Wolfisheim')
 
 #2 recupere le code INSEE associe au code potal
-insee, ville, population = f.recup_commune(code_postal)
+insee, ville = f.recup_code_insee(user_request)
 
 #3 recupere la liste des stations situées dans la ville
 station_req, stations = f.recup_list_stations(insee, ville)
